@@ -1,0 +1,46 @@
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+coverage/
+**/build/
+
+# Generated Flutter platform files
+ios/Flutter/ephemeral/
+windows/flutter/ephemeral/
+linux/flutter/ephemeral/
+macos/Flutter/ephemeral/
+
+# Compiled packages and binaries
+*.apk
+*.aab
+*.exe
+*.dll
+*.so
+*.dylib
+*.pdb
+*.obj
+*.o
+
+# Temporary and generated files
+*.tmp
+*.temp
+*.log
+*.cache
+
+# Android build files
+android/.gradle/
+android/app/build/
+android/local.properties
+android/app/release/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# Operating system files
+.DS_Store
+Thumbs.db
