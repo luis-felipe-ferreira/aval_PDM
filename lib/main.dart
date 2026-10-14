@@ -127,11 +127,29 @@ class GameRound extends ChangeNotifier {
   static String _normalize(String character) {
     final upper = character.toUpperCase();
     const accents = {
-      'Á': 'A', 'À': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A',
-      'É': 'E', 'È': 'E', 'Ê': 'E', 'Ë': 'E',
-      'Í': 'I', 'Ì': 'I', 'Î': 'I', 'Ï': 'I',
-      'Ó': 'O', 'Ò': 'O', 'Ô': 'O', 'Õ': 'O', 'Ö': 'O',
-      'Ú': 'U', 'Ù': 'U', 'Û': 'U', 'Ü': 'U', 'Ç': 'C',
+      'Á': 'A',
+      'À': 'A',
+      'Â': 'A',
+      'Ã': 'A',
+      'Ä': 'A',
+      'É': 'E',
+      'È': 'E',
+      'Ê': 'E',
+      'Ë': 'E',
+      'Í': 'I',
+      'Ì': 'I',
+      'Î': 'I',
+      'Ï': 'I',
+      'Ó': 'O',
+      'Ò': 'O',
+      'Ô': 'O',
+      'Õ': 'O',
+      'Ö': 'O',
+      'Ú': 'U',
+      'Ù': 'U',
+      'Û': 'U',
+      'Ü': 'U',
+      'Ç': 'C',
     };
     return accents[upper] ?? upper;
   }
@@ -150,9 +168,12 @@ class GameSession extends ChangeNotifier {
 
   GameRound? startRound(AnswerCategory category, Difficulty difficulty) {
     final key = '${category.name}|${difficulty.name}';
-    final available = answers.where((answer) =>
-        answer.category == category && answer.difficulty == difficulty &&
-        !_usedAnswers.contains('$key|${answer.text}')).toList();
+    final available = answers
+        .where((answer) =>
+            answer.category == category &&
+            answer.difficulty == difficulty &&
+            !_usedAnswers.contains('$key|${answer.text}'))
+        .toList();
 
     if (available.isEmpty) return null;
 
@@ -217,9 +238,11 @@ class _LoadingPageState extends State<LoadingPage> {
             body: Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text('Não foi possível carregar as respostas.\n'
+                child: Text(
+                    'Não foi possível carregar as respostas.\n'
                     'Confira o arquivo JSON e tente abrir o app novamente.\n\n'
-                    '${snapshot.error}', textAlign: TextAlign.center),
+                    '${snapshot.error}',
+                    textAlign: TextAlign.center),
               ),
             ),
           );
@@ -227,6 +250,19 @@ class _LoadingPageState extends State<LoadingPage> {
         if (!snapshot.hasData) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (snapshot.data!.isEmpty) {
+          return const Scaffold(
+            body: Center(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Text(
+                  'O arquivo de respostas está vazio. Adicione respostas ao JSON e abra o app novamente.',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
           );
         }
         return HomePage(session: GameSession(snapshot.data!));
@@ -245,15 +281,33 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  AnswerCategory _category = AnswerCategory.animals;
-  Difficulty _difficulty = Difficulty.easy;
+  late AnswerCategory _category;
+  late Difficulty _difficulty;
   GameRound? _round;
+
+  @override
+  void initState() {
+    super.initState();
+    _category = _availableCategories.first;
+    _difficulty = _difficultiesFor(_category).first;
+  }
+
+  List<AnswerCategory> get _availableCategories =>
+      widget.session.answers.map((answer) => answer.category).toSet().toList();
+
+  List<Difficulty> _difficultiesFor(AnswerCategory category) =>
+      widget.session.answers
+          .where((answer) => answer.category == category)
+          .map((answer) => answer.difficulty)
+          .toSet()
+          .toList();
 
   void _startRound() {
     final round = widget.session.startRound(_category, _difficulty);
     if (round == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Todas as respostas dessa opção já foram usadas.')),
+        const SnackBar(
+            content: Text('Todas as respostas dessa opção já foram usadas.')),
       );
       return;
     }
@@ -281,13 +335,16 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Fechar'))],
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Fechar'))
+        ],
       ),
     );
   }
 
   void _showAbout() {
-    // Substituir “Adonias” pelo nome completo antes da entrega final.
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -298,10 +355,14 @@ class _HomePageState extends State<HomePage> {
           children: [
             Text('Luis Felipe Ferreira Martins'),
             SizedBox(height: 8),
-            Text('Adonias (completar nome)'),
+            Text('Adonias Pereira dos Santos Terceiro'),
           ],
         ),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Fechar'))],
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Fechar'))
+        ],
       ),
     );
   }
@@ -313,8 +374,14 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Jogo da Forca'),
         actions: [
-          IconButton(onPressed: _showStats, tooltip: 'Estatísticas', icon: const Icon(Icons.bar_chart)),
-          IconButton(onPressed: _showAbout, tooltip: 'Sobre', icon: const Icon(Icons.info_outline)),
+          IconButton(
+              onPressed: _showStats,
+              tooltip: 'Estatísticas',
+              icon: const Icon(Icons.bar_chart)),
+          IconButton(
+              onPressed: _showAbout,
+              tooltip: 'Sobre',
+              icon: const Icon(Icons.info_outline)),
         ],
       ),
       body: SafeArea(
@@ -342,25 +409,50 @@ class _HomePageState extends State<HomePage> {
             children: [
               const Icon(Icons.extension, size: 72, color: Color(0xFF146C70)),
               const SizedBox(height: 12),
-              Text('Prepare a partida', style: Theme.of(context).textTheme.headlineMedium,
+              Text('Prepare a partida',
+                  style: Theme.of(context).textTheme.headlineMedium,
                   textAlign: TextAlign.center),
               const SizedBox(height: 24),
               DropdownButtonFormField<AnswerCategory>(
-                value: _category,
-                decoration: const InputDecoration(labelText: 'Categoria', border: OutlineInputBorder()),
-                items: AnswerCategory.values.map((item) => DropdownMenuItem(
-                  value: item, child: Text(item.label),
-                )).toList(),
-                onChanged: (value) => setState(() => _category = value!),
+                initialValue: _category,
+                decoration: const InputDecoration(
+                    labelText: 'Categoria', border: OutlineInputBorder()),
+                items: _availableCategories
+                    .map((item) => DropdownMenuItem(
+                          value: item,
+                          child: Text(item.label),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  if (value == null) {
+                    return;
+                  }
+                  setState(() {
+                    _category = value;
+                    final difficulties = _difficultiesFor(value);
+                    if (!difficulties.contains(_difficulty)) {
+                      _difficulty = difficulties.first;
+                    }
+                  });
+                },
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<Difficulty>(
-                value: _difficulty,
-                decoration: const InputDecoration(labelText: 'Dificuldade', border: OutlineInputBorder()),
-                items: Difficulty.values.map((item) => DropdownMenuItem(
-                  value: item, child: Text(item.label),
-                )).toList(),
-                onChanged: (value) => setState(() => _difficulty = value!),
+                key: ValueKey(_category),
+                initialValue: _difficulty,
+                decoration: const InputDecoration(
+                    labelText: 'Dificuldade', border: OutlineInputBorder()),
+                items: _difficultiesFor(_category)
+                    .map((item) => DropdownMenuItem(
+                          value: item,
+                          child: Text(item.label),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() => _difficulty = value);
+                  }
+                },
               ),
               const SizedBox(height: 24),
               FilledButton.icon(
@@ -431,7 +523,8 @@ class _GamePageState extends State<GamePage> {
           constraints: const BoxConstraints(maxWidth: 650),
           child: Column(
             children: [
-              Text('${round.answer.category.label} • ${round.answer.difficulty.label}',
+              Text(
+                  '${round.answer.category.label} • ${round.answer.difficulty.label}',
                   style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
               SizedBox(
@@ -453,7 +546,9 @@ class _GamePageState extends State<GamePage> {
                   if (!_isLetter(character)) {
                     return SizedBox(
                       width: character == ' ' ? 18 : 24,
-                      child: Center(child: Text(character, style: const TextStyle(fontSize: 27))),
+                      child: Center(
+                          child: Text(character,
+                              style: const TextStyle(fontSize: 27))),
                     );
                   }
                   return Container(
@@ -462,7 +557,8 @@ class _GamePageState extends State<GamePage> {
                     decoration: const BoxDecoration(
                       border: Border(bottom: BorderSide(width: 2)),
                     ),
-                    child: Text(shown ? character : ' ', style: const TextStyle(fontSize: 24)),
+                    child: Text(shown ? character : ' ',
+                        style: const TextStyle(fontSize: 24)),
                   );
                 }).toList(),
               ),
@@ -516,20 +612,27 @@ class _GamePageState extends State<GamePage> {
       children: [
         Text(won ? 'Você venceu!' : 'Fim de jogo: você perdeu.',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              color: won ? Colors.green.shade800 : Colors.red.shade700,
-              fontWeight: FontWeight.bold,
-            ), textAlign: TextAlign.center),
+                  color: won ? Colors.green.shade800 : Colors.red.shade700,
+                  fontWeight: FontWeight.bold,
+                ),
+            textAlign: TextAlign.center),
         const SizedBox(height: 8),
-        Text('Resposta: ${round.answer.text}\n'
+        Text(
+            'Resposta: ${round.answer.text}\n'
             'Erros: ${round.errors}\n'
-            'Dica usada: ${round.hintUsed ? 'sim' : 'não'}', textAlign: TextAlign.center),
+            'Dica usada: ${round.hintUsed ? 'sim' : 'não'}',
+            textAlign: TextAlign.center),
         const SizedBox(height: 12),
         Wrap(
           spacing: 10,
           alignment: WrapAlignment.center,
           children: [
-            FilledButton(onPressed: widget.onNewRound, child: const Text('Nova partida')),
-            TextButton(onPressed: widget.onChooseOther, child: const Text('Trocar opções')),
+            FilledButton(
+                onPressed: widget.onNewRound,
+                child: const Text('Nova partida')),
+            TextButton(
+                onPressed: widget.onChooseOther,
+                child: const Text('Trocar opções')),
           ],
         ),
       ],
@@ -557,22 +660,41 @@ class HangmanPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     final left = size.width * 0.28;
-    final top = 14.0;
+    const top = 14.0;
     final bottom = size.height - 12;
     canvas.drawLine(Offset(left, bottom), Offset(left + 90, bottom), wood);
     canvas.drawLine(Offset(left + 45, bottom), Offset(left + 45, top), wood);
     canvas.drawLine(Offset(left + 45, top), Offset(left + 120, top), wood);
-    canvas.drawLine(Offset(left + 120, top), Offset(left + 120, top + 22), wood);
+    canvas.drawLine(
+        Offset(left + 120, top), Offset(left + 120, top + 22), wood);
 
     final head = Offset(left + 120, top + 40);
-    if (errors >= 1) canvas.drawCircle(head, 18, person);
-    if (errors >= 2) canvas.drawLine(Offset(head.dx, head.dy + 18), Offset(head.dx, head.dy + 72), person);
-    if (errors >= 3) canvas.drawLine(Offset(head.dx, head.dy + 32), Offset(head.dx - 25, head.dy + 55), person);
-    if (errors >= 4) canvas.drawLine(Offset(head.dx, head.dy + 32), Offset(head.dx + 25, head.dy + 55), person);
-    if (errors >= 5) canvas.drawLine(Offset(head.dx, head.dy + 72), Offset(head.dx - 23, head.dy + 105), person);
-    if (errors >= 6) canvas.drawLine(Offset(head.dx, head.dy + 72), Offset(head.dx + 23, head.dy + 105), person);
+    if (errors >= 1) {
+      canvas.drawCircle(head, 18, person);
+    }
+    if (errors >= 2) {
+      canvas.drawLine(
+          Offset(head.dx, head.dy + 18), Offset(head.dx, head.dy + 72), person);
+    }
+    if (errors >= 3) {
+      canvas.drawLine(Offset(head.dx, head.dy + 32),
+          Offset(head.dx - 25, head.dy + 55), person);
+    }
+    if (errors >= 4) {
+      canvas.drawLine(Offset(head.dx, head.dy + 32),
+          Offset(head.dx + 25, head.dy + 55), person);
+    }
+    if (errors >= 5) {
+      canvas.drawLine(Offset(head.dx, head.dy + 72),
+          Offset(head.dx - 23, head.dy + 105), person);
+    }
+    if (errors >= 6) {
+      canvas.drawLine(Offset(head.dx, head.dy + 72),
+          Offset(head.dx + 23, head.dy + 105), person);
+    }
   }
 
   @override
-  bool shouldRepaint(covariant HangmanPainter oldDelegate) => errors != oldDelegate.errors;
+  bool shouldRepaint(covariant HangmanPainter oldDelegate) =>
+      errors != oldDelegate.errors;
 }
