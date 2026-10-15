@@ -60,7 +60,14 @@ Para executar em outro dispositivo disponível, use `flutter devices` para ver a
 
 ## Organização
 
-- `lib/main.dart`: modelos, carregamento do JSON, regras da partida, estatísticas e telas.
+- `lib/main.dart`: ponto de entrada do aplicativo.
+- `lib/app/`: configuração principal do app.
+- `lib/models/`: resposta, categoria, dificuldade e estado da partida.
+- `lib/data/`: carregamento e leitura do JSON local.
+- `lib/game/`: regras da rodada, sessão, sorteio e normalização de letras.
+- `lib/screens/`: carregamento, seleção de partida e tela do jogo.
+- `lib/widgets/`: teclado, resposta, resultado e diálogos reutilizáveis.
+- `lib/painters/`: desenho da forca.
 - `assets/data/hangman_entries.json`: respostas, categorias, níveis e dicas.
 
 
